@@ -6,6 +6,11 @@ build-backend = "setuptools.build_meta"
 name = "koinonia-db"
 version = "0.5.0"
 description = "Shared database models and migrations for ORGAN-VI Koinonia"
+readme = "README.md"
+authors = [
+    { name = "ORGAN-VI Koinonia Maintainers" }
+]
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "sqlalchemy[asyncio]>=2.0",
