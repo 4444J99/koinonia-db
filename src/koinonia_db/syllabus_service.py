@@ -134,7 +134,7 @@ async def generate_learning_path(
             seq=i,
         ))
 
-    await session.commit()
+    await session.flush()
 
     return {
         "path_id": path_id,
