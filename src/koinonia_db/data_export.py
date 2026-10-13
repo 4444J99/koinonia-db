@@ -8,28 +8,27 @@ and seed files from disk.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from koinonia_db.models import (
-    Base,
-    SalonSessionRow,
-    Participant,
-    Segment,
-    TaxonomyNodeRow,
-    Curriculum,
-    ReadingSessionRow,
-    Entry,
-    SessionEntry,
-    DiscussionQuestion,
-    Guide,
-    Event,
-    Contributor,
     Contribution,
+    Contributor,
+    Curriculum,
+    DiscussionQuestion,
+    Entry,
+    Event,
+    Guide,
     LearnerProfileRow,
-    LearningPathRow,
     LearningModuleRow,
+    LearningPathRow,
+    Participant,
+    ReadingSessionRow,
+    SalonSessionRow,
+    Segment,
+    SessionEntry,
+    TaxonomyNodeRow,
 )
 
 PACKAGE_VERSION = "0.5.0"
@@ -92,10 +91,7 @@ def _count_seed_entries(data: Any) -> int:
     if isinstance(data, list):
         return len(data)
     if isinstance(data, dict):
-        # Look for the first list-valued key (e.g., "sessions", "curricula", "entries")
-        for v in data.values():
-            if isinstance(v, list):
-                return len(v)
+        return sum(len(v) for v in data.values() if isinstance(v, list))
     return 0
 
 
@@ -127,7 +123,7 @@ def build_manifest(seed_dir: Path | None = None) -> dict[str, Any]:
     schema = export_schema_manifest()
     seed = export_seed_manifest(seed_dir)
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "package_version": PACKAGE_VERSION,
         "model_count": schema["model_count"],
         "models": [m["class_name"] for m in schema["models"]],

@@ -3,13 +3,13 @@ import json
 from pathlib import Path
 
 from koinonia_db.data_export import (
+    ALL_MODELS,
+    _count_seed_entries,
     build_manifest,
     export_schema_manifest,
     export_seed_manifest,
     main,
-    ALL_MODELS,
 )
-
 
 SEED_DIR = Path(__file__).parent.parent / "seed"
 
@@ -51,14 +51,40 @@ def test_schema_manifest_schemas():
     assert "syllabus" in schemas
 
 
+def test_count_seed_entries_various_structures():
+    """_count_seed_entries counts top-level lists and list-valued dict entries."""
+    # Top-level list
+    assert _count_seed_entries(["a", "b", "c"]) == 3
+
+    # Dict with single list
+    assert _count_seed_entries({"items": [1, 2, 3]}) == 3
+
+    # Dict with multiple list collections
+    assert _count_seed_entries({"events": [1, 2, 3], "contributors": [1]}) == 4
+    assert _count_seed_entries({"a": [1, 2, 3, 4, 5, 6], "b": [1, 2, 3, 4, 5, 6]}) == 12
+
+    # Scalars do not contribute
+    assert _count_seed_entries({"name": "test", "version": 1, "items": [1, 2]}) == 2
+
+    # Empty lists contribute zero
+    assert _count_seed_entries({"empty": [], "items": [1]}) == 1
+
+    # Unsupported scalar-only structure returns zero
+    assert _count_seed_entries({"name": "test", "version": 1}) == 0
+    assert _count_seed_entries("string_data") == 0
+    assert _count_seed_entries(123) == 0
+
+
 def test_seed_manifest_with_real_seed():
     """Seed manifest correctly inventories the actual seed directory."""
     result = export_seed_manifest(SEED_DIR)
-    assert result["total_seed_entries"] > 0
-    assert "sample_sessions.json" in result["seed_files"]
-    assert "curricula.json" in result["seed_files"]
-    assert "taxonomy.json" in result["seed_files"]
-    assert result["seed_files"]["sample_sessions.json"]["entries"] >= 2
+    assert result["total_seed_entries"] == 68
+    assert result["seed_files"]["community.json"]["entries"] == 4
+    assert result["seed_files"]["product_communities.json"]["entries"] == 12
+    assert result["seed_files"]["curricula.json"]["entries"] == 3
+    assert result["seed_files"]["reading_lists.json"]["entries"] == 39
+    assert result["seed_files"]["sample_sessions.json"]["entries"] == 2
+    assert result["seed_files"]["taxonomy.json"]["entries"] == 8
 
 
 def test_seed_manifest_missing_dir(tmp_path):
