@@ -2,7 +2,7 @@
 
 Shared database models, migrations, and seed data for all ORGAN-VI Koinonia repositories.
 
-[![CI](https://github.com/organvm-vi-koinonia/koinonia-db/actions/workflows/ci.yml/badge.svg)](https://github.com/organvm-vi-koinonia/koinonia-db/actions/workflows/ci.yml)
+[![CI](https://github.com/4444J99/koinonia-db/actions/workflows/ci.yml/badge.svg)](https://github.com/4444J99/koinonia-db/actions/workflows/ci.yml)
 
 ## Overview
 
